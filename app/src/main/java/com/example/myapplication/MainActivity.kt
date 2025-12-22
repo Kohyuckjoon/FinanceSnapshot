@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,15 +36,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CheckboxDefaults.colors
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
@@ -107,123 +112,73 @@ fun Home( onClick: () -> Unit ) {
             )
         },
     ) { innerPadding ->
-        Column (
+        // 데이터 모델 정의
+        val assetList = listOf("은행 잔고 1", "은행 잔고 2", "은행 잔고 3", "은행 잔고 4", "주식 계좌", "비상금 계좌")
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .background(Color.White)
-                .verticalScroll(rememberScrollState())
         ) {
-            Card (
-                modifier = Modifier
-                    .padding(20.dp)
-                    .fillMaxWidth()
-                    .background(Color(0xC9F7FF))
-            ) {
-                Column (
-                    modifier = Modifier
-                        .padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            item {
+                ElevatedCard(
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 35.dp, bottom = 30.dp).fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB3D9FF))
                 ) {
-                    Text("총 자산 현황")
-                    Text("₩ 150,000")
-                    Text("전월 대비 + 1.5%")
+                    Column(
+                        modifier = Modifier.padding(32.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("총 자산 현황", color = Color.Black, fontSize = 15.sp)
+                        Text(
+                            "₩ 1,150,000",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            fontSize = 35.sp
+                        )
+                        Text("전월 대비 + 1.5%",  modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 10.dp), color = Color.Green, fontSize = 20.sp)
+                    }
                 }
+            }
+
+            item {
+                Text("자산 분류 비율 (차트 대체)",  modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 10.dp), color = Color.Black, fontSize = 20.sp)
+            }
+
+            item {
+                ElevatedCard(modifier = Modifier.padding(horizontal = 25.dp).fillMaxWidth()) {
+                    Text("test", modifier = Modifier.padding(25.dp))
+                }
+            }
+
+            item {
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp, top = 30.dp, bottom = 30.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween, // 양쪽으로 밀어내기
+                    verticalAlignment = Alignment.CenterVertically // 높이 중앙 맞춤
+                ){
+                    Text("주요 자산 목록 / 최근 활동")
+                    Text("전체 내역 보기")
+                }
+
+            }
+
+            items(assetList) { asset ->
+                ListItem(
+                    headlineContent = { Text(asset) },
+                    supportingContent = { Text("자세한 자산 정보가 여기 표시됩니다.") },
+                    leadingContent = {
+                        Icon(Icons.Default.ArrowBack , contentDescription = null, tint = Color.Blue)
+                    },
+                    modifier = Modifier.clickable { /*클릭 이벤트*/ }
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             }
         }
     }
 }
-
-
-//    val lightBlue = Color(0xA6DAF4)
-//
-//    Column(
-//        modifier = Modifier
-//            .background(Color.White)
-//            .fillMaxSize(),
-//        verticalArrangement = Arrangement.Top,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Card(
-//            modifier = Modifier
-//                .clip(RoundedCornerShape(15.dp))
-//                .padding(20.dp),
-//            colors = CardDefaults.cardColors(
-//                containerColor = Color(0xFFD1E4FF)),
-//            onClick = { onClick() }
-//        ) {
-//            Column (
-//                modifier = Modifier
-//                    .clickable(onClick = onClick)
-//                    .padding(32.dp)
-//                    .fillMaxWidth()
-//                    .background(Color(0xFFD1E4FF)),
-//                verticalArrangement = Arrangement.Top,
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//            ) {
-//                Text("총 자산 현황",
-//                    fontSize = 15.sp,
-//                    color = Color.Black)
-//
-//                Text("₩ 1,500,000",
-//                    Modifier.padding(0.dp, 5.dp, 0.dp, 5.dp),
-//                    fontSize = 35.sp,
-//                    color = Color.Black)
-//
-//                Text("전월 대비  + 1.5%",
-//                    fontSize = 14.sp,
-//                    color = Color.Green)
-//            }
-//        }
-//
-//        Column(
-//            modifier = Modifier
-//                .padding(20.dp, 20.dp, 5.dp, 5.dp)
-//                .fillMaxWidth(),
-//            verticalArrangement = Arrangement.Top
-//        ) {
-//            Text("자산 분류 비율 (차트 대체)",
-//                fontSize = 20.sp)
-//        }
-//
-//        Card (
-//            modifier = Modifier
-//                .clickable(onClick = onClick)
-//                .clip(RoundedCornerShape(15.dp))
-//                .padding(20.dp, 10.dp, 20.dp, 5.dp)
-//                .fillMaxWidth()
-//        ) {
-//            Column (modifier = Modifier
-//                .padding(32.dp)
-//                .fillMaxWidth(),
-//                verticalArrangement = Arrangement.Top,
-//                horizontalAlignment = Alignment.CenterHorizontally){
-//
-//                Text("파이 차트 시각영역")
-//            }
-//        }
-//
-//        Column (
-//            modifier = Modifier
-//                .padding(20.dp, 20.dp, 5.dp, 5.dp)
-//                .fillMaxWidth(),
-//            verticalArrangement = Arrangement.Top
-//        ) {
-//            Text("주요 자산 목록 / 최근 활동",
-//                fontSize = 20.sp)
-//        }
-//
-//        val assetList = listOf("은행 잔고 1", "은행 잔고 2", "은행 잔고 3")
-//        LazyColumn (
-//            modifier = Modifier
-//                .fillMaxSize()
-//        ) {
-//            items(assetList) { asset ->
-//                Text(text = asset, modifier = Modifier.padding(16.dp))
-//                HorizontalDivider()
-//            }
-//        }
-//    }
 
 @Preview(showBackground = true)
 @Composable
