@@ -36,12 +36,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CheckboxDefaults.colors
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -50,6 +52,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.compose.composable
 import kotlin.io.path.Path
 
 class MainActivity : ComponentActivity() {
@@ -59,7 +62,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                Home() {}
+                val navController = androidx.navigation.compose.rememberNavController()
+
+                androidx.navigation.compose.NavHost(
+                    navController = navController,
+                    startDestination = "home" // 시작 화면 주소
+                ) {
+                    composable ("home"){
+                        Home (
+                            onNavigateToList = { navController.navigate("list") },
+                            onNavigateToAdd = {navController.navigate("add") }
+                        )
+                    }
+
+                    composable("list") {
+                        TransactionListScreenHome(
+                            onBack = { navController.popBackStack() } // 뒤로가기
+                        )
+                    }
+
+                    composable("add") {
+                        AddDataScreen (
+                            onBack = { navController.popBackStack() } // 뒤로가기
+                        )
+                    }
+                }
             }
         }
     }
@@ -67,7 +94,10 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home( onClick: () -> Unit ) {
+fun Home(
+    onNavigateToList: () -> Unit,
+    onNavigateToAdd: () -> Unit,
+) {
 
     Scaffold(
         // 전체 구조
@@ -99,18 +129,18 @@ fun Home( onClick: () -> Unit ) {
                         )
                     }
                 },
-
-                // 왼쪽에서부터 시작
-                navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로가기"
-                        )
-                    }
-                },
             )
         },
+
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    onNavigateToAdd()
+                }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "추가 하기")
+            }
+        }
     ) { innerPadding ->
         // 데이터 모델 정의
         val assetList = listOf("은행 잔고 1", "은행 잔고 2", "은행 잔고 3", "은행 잔고 4", "주식 계좌", "비상금 계좌")
@@ -184,6 +214,9 @@ fun Home( onClick: () -> Unit ) {
 @Composable
 fun GreetingPreview() {
     MyApplicationTheme {
-        Home() {}
+        Home(
+            onNavigateToList = {},
+            onNavigateToAdd = {}
+        )
     }
 }
