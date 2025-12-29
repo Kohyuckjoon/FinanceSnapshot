@@ -67,7 +67,7 @@ fun AddDataScreen(onBack: () -> Unit) {
                 ),
 
                 title = {
-                    Text("데이터 추가", color = Color.Black)
+                    Text("지출내역 추가", color = Color.Black)
                 },
 
                 navigationIcon = {
@@ -96,16 +96,8 @@ fun AddDataScreen(onBack: () -> Unit) {
     ){ innerPadding ->
         Column (
             modifier = Modifier.padding(innerPadding)
-
         ){
-            Text("자산 유형 선택 : ", modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 20.dp, bottom = 5.dp), fontSize = 15.sp)
-            OutlinedTextField(
-                value = assetType,
-                onValueChange = { assetType = it }, // 글자를 칠 때마다 변수에 저장
-                modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 10.dp).fillMaxWidth()
-            )
-
-            Text("금액 : ", modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 10.dp), fontSize = 15.sp)
+            Text("금액 : ", modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 30.dp, bottom = 10.dp), fontSize = 15.sp)
             OutlinedTextField(
                 value = assetType,
                 onValueChange = { assetType = it }, // 글자를 칠 때마다 변수에 저장
