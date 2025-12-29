@@ -84,7 +84,7 @@ fun AddDataScreen(onBack: () -> Unit) {
         bottomBar = {
             ElevatedButton(
                 onClick = { onBack() },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp,16.dp, 50.dp),
                 colors = ButtonDefaults.elevatedButtonColors(
                     contentColor = Color.White,
                     containerColor = Color(0xFF00668C)
