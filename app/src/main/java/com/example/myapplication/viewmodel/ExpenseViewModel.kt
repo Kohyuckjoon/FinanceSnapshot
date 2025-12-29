@@ -3,9 +3,12 @@ package com.example.myapplication.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.ExpenseEntity
+import com.example.myapplication.data.ExpenseRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 // UI 상태 관리 및 로직
 class ExpenseViewModel (private val repository: ExpenseRepository) : ViewModel() {
