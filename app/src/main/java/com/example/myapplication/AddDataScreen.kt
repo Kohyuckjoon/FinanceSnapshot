@@ -39,6 +39,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.ui.theme.Home
+import com.example.myapplication.ui.theme.MainActivity
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class AddDataScreen : ComponentActivity() {
@@ -48,7 +53,18 @@ class AddDataScreen : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                AddDataScreen(onBack = {finish()})
+                val navController = rememberNavController()
+
+                NavHost(navController = navController, startDestination = "addDataHome") {
+                    composable ("addDataHome"){
+                        Home (
+                            onNavigateToList = {},
+                            onNavigateToAdd = {
+                                navController.navigate("addDataHome")
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -56,7 +72,13 @@ class AddDataScreen : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddDataScreen(onBack: () -> Unit) {
+fun AddDataScreen(
+        onBack: () -> Unit,
+        onNavigateToHome: () -> Unit,
+    ) {
+    var amount by remember { mutableStateOf("") }
+    var memo by remember { mutableStateOf("") }
+
     var assetType by remember { mutableStateOf("") }
     Scaffold (
         topBar = {
@@ -83,7 +105,7 @@ fun AddDataScreen(onBack: () -> Unit) {
 
         bottomBar = {
             ElevatedButton(
-                onClick = { onBack() },
+                onClick = { onNavigateToHome() },
                 modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp,16.dp, 50.dp),
                 colors = ButtonDefaults.elevatedButtonColors(
                     contentColor = Color.White,
@@ -118,6 +140,9 @@ fun AddDataScreen(onBack: () -> Unit) {
 @Composable
 fun GreetingPreview2() {
     MyApplicationTheme {
-        AddDataScreen() {}
+        AddDataScreen(
+            onBack = {  },
+            onNavigateToHome = {  }
+        )
     }
 }
