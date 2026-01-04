@@ -112,8 +112,14 @@ fun AddDataScreen(
         bottomBar = {
             ElevatedButton(
                 onClick = {
-                    Toast.makeText(context, "저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    onNavigateToHome()
+                    if (assetType.isEmpty()) {
+                        Toast.makeText(context, "금액을 입력해주세요!", Toast.LENGTH_SHORT).show()
+                    } else if (memoType.isEmpty()) {
+                        Toast.makeText(context, "메모를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        onNavigateToHome()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp,16.dp, 50.dp),
                 colors = ButtonDefaults.elevatedButtonColors(
