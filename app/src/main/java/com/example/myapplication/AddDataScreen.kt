@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.R.id.title
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +81,11 @@ fun AddDataScreen(
     var amount by remember { mutableStateOf("") }
     var memo by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+
     var assetType by remember { mutableStateOf("") }
+    var memoType by remember { mutableStateOf("") }
+
     Scaffold (
         topBar = {
             TopAppBar(
@@ -105,7 +111,10 @@ fun AddDataScreen(
 
         bottomBar = {
             ElevatedButton(
-                onClick = { onNavigateToHome() },
+                onClick = {
+                    Toast.makeText(context, "저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                    onNavigateToHome()
+                },
                 modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp,16.dp, 50.dp),
                 colors = ButtonDefaults.elevatedButtonColors(
                     contentColor = Color.White,
@@ -128,8 +137,8 @@ fun AddDataScreen(
 
             Text("메모 / 상세 내용 : ", modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 10.dp), fontSize = 15.sp)
             OutlinedTextField(
-                value = assetType,
-                onValueChange = { assetType = it }, // 글자를 칠 때마다 변수에 저장
+                value = memoType,
+                onValueChange = { memoType = it }, // 글자를 칠 때마다 변수에 저장
                 modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 10.dp, bottom = 5.dp).fillMaxWidth()
             )
         }
