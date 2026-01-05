@@ -22,20 +22,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.AddDataScreen
+import com.example.myapplication.viewmodel.ExpenseViewModel
+import androidx.compose.foundation.lazy.items
 
 // 앱의 진입점 및 내비게이션 설정
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -73,7 +78,9 @@ class MainActivity : ComponentActivity() {
 fun Home(
     onNavigateToList: () -> Unit,
     onNavigateToAdd: () -> Unit,
+    viewModel: ExpenseViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    val expenseList by viewModel.allExpenses.collectAsState(initial = emptyList())
     Scaffold(
         topBar = {
             TopAppBar(
@@ -130,16 +137,16 @@ fun Home(
                 modifier = Modifier.padding(15.dp).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
-                item {
-                    Text("test_01")
+                items(expenseList) { expense ->
+                    Card (modifier = Modifier.fillMaxWidth()){
+                        Column (modifier = Modifier.padding(10.dp)){
+                            Text(text = expense.title, fontWeight = FontWeight.Bold)
+                            Text(text = "${expense.amount}원", color = Color.Red)
+                        }
+                    }
                 }
-
                 item {
-                    Text("test_02")
-                }
-
-                item {
-                    Text("test_03")
+                    Text("리스트 끝", color = Color.LightGray, fontSize = 12.sp)
                 }
             }
         }

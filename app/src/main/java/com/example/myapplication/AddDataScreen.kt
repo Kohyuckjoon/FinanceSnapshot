@@ -41,15 +41,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.Home
 import com.example.myapplication.ui.theme.MainActivity
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.viewmodel.ExpenseViewModel
 
 class AddDataScreen : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -77,14 +78,11 @@ class AddDataScreen : ComponentActivity() {
 fun AddDataScreen(
         onBack: () -> Unit,
         onNavigateToHome: () -> Unit,
+        viewModel: ExpenseViewModel = androidx.lifecycle.viewmodel.compose.viewModel() // viewModel 주입
     ) {
-    var amount by remember { mutableStateOf("") }
-    var memo by remember { mutableStateOf("") }
-
     val context = LocalContext.current
-
-    var assetType by remember { mutableStateOf("") }
-    var memoType by remember { mutableStateOf("") }
+    var assetType by remember { mutableStateOf("") } // 금액
+    var memoType by remember { mutableStateOf("") } // 메모
 
     Scaffold (
         topBar = {
@@ -117,6 +115,10 @@ fun AddDataScreen(
                     } else if (memoType.isEmpty()) {
                         Toast.makeText(context, "메모를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     } else {
+                        viewModel.addExpense(
+                            title = memoType,
+                            amount = assetType.toLongOrNull() ?: 0L
+                        )
                         Toast.makeText(context, "저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                         onNavigateToHome()
                     }
