@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.theme
 
 import android.graphics.drawable.Icon
+import android.icu.text.DecimalFormat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,6 +39,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.AddDataScreen
 import com.example.myapplication.viewmodel.ExpenseViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.example.myapplication.data.ExpenseEntity
 
 // 앱의 진입점 및 내비게이션 설정
 class MainActivity : ComponentActivity() {
@@ -81,6 +87,39 @@ fun Home(
     viewModel: ExpenseViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val expenseList by viewModel.allExpenses.collectAsState(initial = emptyList())
+    val totalAmount by viewModel.totalAmount.collectAsState()
+    val formatter = DecimalFormat("#,###")
+
+    // 다이얼로그 추가
+    var showDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<ExpenseEntity?> (null) }
+
+    if (showDialog && itemToDelete != null){
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDialog = false }, // 외부 클릭시 닫기
+            title = { Text(text = "선택한 항목을 삭제하시겠습니까?")},
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        itemToDelete?.let {viewModel.deleteExpense(it)}
+                        showDialog = false
+                    }
+                ) {
+                    Text("삭제", color = Color.Red)
+                }
+            },
+
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {showDialog = false}
+                ) {
+                    Text("취소")
+                }
+            }
+
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -90,7 +129,7 @@ fun Home(
                 ),
 
                 title = {
-                    Text("미니 시그널(가계부)", color = Color.Black, fontWeight = FontWeight.Bold)
+                    Text("부동산 계산기", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
             )
         },
@@ -122,13 +161,17 @@ fun Home(
                 Column (
                     modifier = Modifier.padding(20.dp).fillMaxWidth(),
                 ){
-                    Text("이번달 총 지출", fontSize = 13.sp)
-                    Text("51,750원", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text("총 보증금액", fontSize = 13.sp)
+                    Text(
+                        "${formatter.format(totalAmount)}원",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 
             Column (
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
+                modifier = Modifier.fillMaxWidth().padding(10.dp, 20.dp, 10.dp, 7.dp)
             ){
                 Text("최근 내역", fontWeight = FontWeight.Bold, color = Color.Gray)
             }
@@ -138,15 +181,39 @@ fun Home(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
                 items(expenseList) { expense ->
+                    val formatter = DecimalFormat("#,###")
+                    val formattedAmount = formatter.format(expense.amount)
+
                     Card (modifier = Modifier.fillMaxWidth()){
-                        Column (modifier = Modifier.padding(10.dp)){
-                            Text(text = expense.title, fontWeight = FontWeight.Bold)
-                            Text(text = "${expense.amount}원", color = Color.Red)
+                        androidx.compose.foundation.layout.Row (
+                            modifier = Modifier.fillMaxWidth().padding(10.dp, 7.dp, 10.dp, 7.dp)
+                        ){
+                            Column (modifier = Modifier.weight(1f)){
+                                Text(
+                                    modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
+                                    text = expense.title,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
+                                    text = "${formattedAmount}원",
+                                    color = Color.Red
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                itemToDelete = expense
+//                                viewModel.deleteExpense(expense)
+                                showDialog = true
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "삭제",
+                                    tint = Color.Gray
+                                )
+                            }
                         }
                     }
-                }
-                item {
-                    Text("리스트 끝", color = Color.LightGray, fontSize = 12.sp)
                 }
             }
         }

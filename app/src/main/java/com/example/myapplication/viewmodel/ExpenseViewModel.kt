@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.jvm.java
@@ -45,6 +46,16 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     // 전체 리스트를 가져오는 Flow (데이터 변경시에만 자동 업데이트)
     val allExpenses: Flow<List<ExpenseEntity>> = expenseDao.getAllExpenses()
 
+    val totalAmount: StateFlow<Long> = allExpenses
+        .map { list ->
+            list.sumOf { it.amount }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0L
+        )
+
     // 데이터 저장 함수
     fun addExpense(title: String, amount: Long) {
         viewModelScope.launch {
@@ -55,6 +66,12 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
                 data = System.currentTimeMillis() // 현재 시간
             )
             expenseDao.insert(newExpense)
+        }
+    }
+
+    fun deleteExpense(expense: ExpenseEntity) {
+        viewModelScope.launch {
+            expenseDao.delete(expense)
         }
     }
 }
