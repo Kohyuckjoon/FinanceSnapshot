@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -87,8 +88,15 @@ fun Home(
     viewModel: ExpenseViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val expenseList by viewModel.allExpenses.collectAsState(initial = emptyList())
-    val totalAmount by viewModel.totalAmount.collectAsState()
+    val totalAmount by viewModel.totalAmount.collectAsState(initial = 0L)
     val formatter = DecimalFormat("#,###")
+
+//    HomeContent(
+//        expenseList = expenseList,
+//        totalAmount = totalAmount,
+//        onNavigateToAdd = onNavigateToAdd,
+//        onDeleteExpense = { viewModel.deleteExpense(it) }
+//    )
 
     // 다이얼로그 추가
     var showDialog by remember { mutableStateOf(false) }
@@ -176,41 +184,69 @@ fun Home(
                 Text("최근 내역", fontWeight = FontWeight.Bold, color = Color.Gray)
             }
 
-            LazyColumn (
-                modifier = Modifier.padding(15.dp).fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ){
-                items(expenseList) { expense ->
-                    val formatter = DecimalFormat("#,###")
-                    val formattedAmount = formatter.format(expense.amount)
+            if (expenseList.isEmpty()) {
+                Column (
+                    modifier = Modifier.fillMaxWidth().padding(50.dp),
+                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = androidx.compose.ui.Modifier.size(64.dp),
+                        tint = Color.Gray
+                    )
+                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(10.dp))
 
-                    Card (modifier = Modifier.fillMaxWidth()){
-                        androidx.compose.foundation.layout.Row (
-                            modifier = Modifier.fillMaxWidth().padding(10.dp, 7.dp, 10.dp, 7.dp)
-                        ){
-                            Column (modifier = Modifier.weight(1f)){
-                                Text(
-                                    modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
-                                    text = expense.title,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
-                                    text = "${formattedAmount}원",
-                                    color = Color.Red
-                                )
-                            }
+                    Text(
+                        text = "등록된 내역이 없습니다.",
+                        color = Color.Gray,
+                        fontSize = 16.sp
+                    )
 
-                            IconButton(onClick = {
-                                itemToDelete = expense
+                    Text(
+                        text = "하단 + 버튼을 눌러서 추가해주세요.",
+                        color = Color.Gray,
+                        fontSize = 13.sp
+                    )
+                }
+            } else {
+                LazyColumn (
+                    modifier = Modifier.padding(15.dp).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ){
+                    items(expenseList) { expense ->
+                        val formatter = DecimalFormat("#,###")
+                        val formattedAmount = formatter.format(expense.amount)
+
+                        Card (modifier = Modifier.fillMaxWidth()){
+                            androidx.compose.foundation.layout.Row (
+                                modifier = Modifier.fillMaxWidth().padding(10.dp, 7.dp, 10.dp, 7.dp)
+                            ){
+                                Column (modifier = Modifier.weight(1f)){
+                                    Text(
+                                        modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
+                                        text = expense.title,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        modifier = Modifier.padding(10.dp, 5.dp, 10.dp, 5.dp),
+                                        text = "${formattedAmount}원",
+                                        color = Color.Red
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    itemToDelete = expense
 //                                viewModel.deleteExpense(expense)
-                                showDialog = true
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "삭제",
-                                    tint = Color.Gray
-                                )
+                                    showDialog = true
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "삭제",
+                                        tint = Color.Gray
+                                    )
+                                }
                             }
                         }
                     }
@@ -219,6 +255,19 @@ fun Home(
         }
     }
 }
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun HomeContent(
+//    extenseList: List<ExpenseEntity>,
+//    totalAmount: Long,
+//    onNavigateToAdd: () -> Unit,
+//    onDeleteExpense: (ExpenseEntity) -> Unit
+//) {
+//    val
+//}
+//
+//)
 
 
 @Preview(showBackground = true)
