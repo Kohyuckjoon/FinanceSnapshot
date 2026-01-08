@@ -41,6 +41,7 @@ import com.example.myapplication.AddDataScreen
 import com.example.myapplication.viewmodel.ExpenseViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -149,8 +150,9 @@ fun Home(
             ) {
                 Icon(Icons.Default.Add, contentDescription = "추가 버튼")
             }
-        }
+        },
 //        containerColor = Color.DarkGray
+
     ) { innerPadding ->
         Column (
             modifier = Modifier.padding(innerPadding)
@@ -256,27 +258,127 @@ fun Home(
     }
 }
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun HomeContent(
-//    extenseList: List<ExpenseEntity>,
-//    totalAmount: Long,
-//    onNavigateToAdd: () -> Unit,
-//    onDeleteExpense: (ExpenseEntity) -> Unit
-//) {
-//    val
-//}
-//
-//)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeContent(
+    expenseList: List<ExpenseEntity>,
+    totalAmount: Long,
+    onNavigateToAdd: () -> Unit,
+    onDeleteExpense: (ExpenseEntity) -> Unit
+) {
+    val formatter = DecimalFormat("#,###")
+    var showDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<ExpenseEntity?> (null) }
+
+    if (showDialog && itemToDelete != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {Text(text = "선택한 항목을 삭제하시겠습니까?")},
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        itemToDelete?.let { onDeleteExpense(it) }
+                        showDialog = false
+                    }
+                ) {
+                    Text("삭제", color = Color.Red)
+                }
+            },
+
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("취소")
+                }
+            }
+        )
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
+                title = { Text("부동산 계산기", color = Color.Black, fontWeight = FontWeight.Bold) }
+            )
+        },
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(10.dp)) {
+            // 상단 총 보증금액 카드
+            Card(
+                modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp).fillMaxWidth()) {
+                    Text("총 보증금액", fontSize = 13.sp)
+                    Text("${formatter.format(totalAmount)}원", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Text("최근 내역", modifier = Modifier.padding(10.dp, 20.dp, 10.dp, 7.dp), fontWeight = FontWeight.Bold, color = Color.Gray)
+
+            if (expenseList.isEmpty()) {
+                // 비었을 때 UI
+                EmptyListView()
+            } else {
+                // 리스트 UI
+                LazyColumn(modifier = Modifier.padding(15.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(expenseList) { expense ->
+                        ExpenseItem(expense, formatter) {
+                            itemToDelete = expense
+                            showDialog = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 하위 컴포저블 분리
+@Composable
+fun EmptyListView() {
+    Column(modifier = Modifier.fillMaxWidth().padding(50.dp), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(64.dp), tint = Color.Gray)
+        Text("등록된 내역이 없습니다.", color = Color.Gray, fontSize = 16.sp)
+    }
+}
+
+@Composable
+fun ExpenseItem(expense: ExpenseEntity, formatter: DecimalFormat, onDeleteClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        androidx.compose.foundation.layout.Row(modifier = Modifier.fillMaxWidth().padding(10.dp, 7.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = expense.title, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 10.dp))
+                Text(text = "${formatter.format(expense.amount)}원", color = Color.Red, modifier = Modifier.padding(horizontal = 10.dp))
+            }
+            IconButton(onClick = onDeleteClick) {
+                Icon(Icons.Default.Close, contentDescription = "삭제", tint = Color.Gray)
+            }
+        }
+    }
+}
 
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     MyApplicationTheme {
-        Home(
-            onNavigateToList = {},
-            onNavigateToAdd = {}
+//        Home(
+//            onNavigateToList = {},
+//            onNavigateToAdd = {}
+//        )
+        HomeContent(
+            expenseList = listOf(
+                ExpenseEntity(1, "강남 아파트 보증금", 100000000, "부동산", 0L),
+                ExpenseEntity(2, "신림 원룸 보증금", 10000000, "부동산", 0L)
+            ),
+            totalAmount = 110000000L,
+            onNavigateToAdd = {},
+            onDeleteExpense = {}
         )
     }
 }
